@@ -23,6 +23,8 @@ import com.example.bumiku.ui.theme.BlackSolid
 import com.example.bumiku.ui.theme.GoldYellow
 import com.example.bumiku.ui.theme.GreenDeep
 import com.example.bumiku.viewmodel.KomunitasViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun DetailWCom(
@@ -31,6 +33,8 @@ fun DetailWCom(
     viewModel: KomunitasViewModel
 ) {
     val currentKomunitas = viewModel.listKomunitas.find { it.judul == komunitas.judul } ?: komunitas
+    val scope = rememberCoroutineScope()
+    var isCancelling by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -61,141 +65,165 @@ fun DetailWCom(
             }
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color.White)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Box(
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .border(1.dp, BlackSolid.copy(alpha = 0.2f), RoundedCornerShape(20.dp))
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .background(Color.White)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Column {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(id = currentKomunitas.gambar),
-                            contentDescription = currentKomunitas.judul,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                        Surface(
-                            color = GreenDeep,
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                text = currentKomunitas.kategori,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                color = GoldYellow,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = currentKomunitas.judul,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = BlackSolid
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        DetailInfoItem(android.R.drawable.ic_menu_my_calendar, currentKomunitas.tanggal)
-                        DetailInfoItem(android.R.drawable.ic_menu_mylocation, currentKomunitas.lokasi)
-                        DetailInfoItem(android.R.drawable.ic_menu_view, currentKomunitas.penyelenggara)
-                    }
-                }
-            }
-
-            Surface(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, GreenDeep),
-                color = Color.White
-            ) {
-                Row(
-                    modifier = Modifier.padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Box(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(20.dp))
+                        .border(1.dp, BlackSolid.copy(alpha = 0.2f), RoundedCornerShape(20.dp))
                 ) {
-                    Text("Partisipasi", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = BlackSolid)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    LinearProgressIndicator(
-                        progress = { currentKomunitas.slotTerisi.toFloat() / currentKomunitas.totalSlot.toFloat() },
-                        modifier = Modifier.weight(1f).height(10.dp).clip(CircleShape),
-                        color = Color.Red,
-                        trackColor = BlackSolid.copy(alpha = 0.1f)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "${currentKomunitas.slotTerisi}/${currentKomunitas.totalSlot} slot",
-                        color = Color.Red,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 11.sp
-                    )
-                }
-            }
-
-            Column(modifier = Modifier.padding(20.dp)) {
-                Text("Tentang Kegiatan", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = BlackSolid)
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = "Kegiatan bersih-bersih pantai bersama komunitas peduli lingkungan. Peserta diharapkan membawa semangat dan siap menjaga kebersihan pesisir Lampung.",
-                    fontSize = 13.sp,
-                    color = BlackSolid.copy(alpha = 0.6f),
-                    lineHeight = 18.sp
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text("Penyelenggara", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = BlackSolid)
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 10.dp)) {
-                    Surface(modifier = Modifier.size(42.dp), shape = CircleShape, color = GreenDeep) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text("GH", color = GoldYellow, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
                     Column {
-                        Text(currentKomunitas.penyelenggara, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = GreenDeep)
-                        Text("Verified Community", fontSize = 12.sp, color = BlackSolid.copy(alpha = 0.5f))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = currentKomunitas.gambar),
+                                contentDescription = currentKomunitas.judul,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                            Surface(
+                                color = GreenDeep,
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = currentKomunitas.kategori,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    color = GoldYellow,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = currentKomunitas.judul,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = BlackSolid
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            DetailInfoItem(android.R.drawable.ic_menu_my_calendar, currentKomunitas.tanggal)
+                            DetailInfoItem(android.R.drawable.ic_menu_mylocation, currentKomunitas.lokasi)
+                            DetailInfoItem(android.R.drawable.ic_menu_view, currentKomunitas.penyelenggara)
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text("Kamu Sudah Terdaftar", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = BlackSolid)
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)) {
-                    Box(modifier = Modifier.size(14.dp).clip(CircleShape).background(GoldYellow))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text("Partisipasi Aktif", color = GreenDeep, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = {
-                        viewModel.kurangiPartisipan(currentKomunitas.judul)
-                        navController.popBackStack()
-                    },
-                    modifier = Modifier.fillMaxWidth().height(54.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                    shape = RoundedCornerShape(14.dp)
+                Surface(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, GreenDeep),
+                    color = Color.White
                 ) {
-                    Text("Batalkan", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Partisipasi", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = BlackSolid)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        LinearProgressIndicator(
+                            progress = { currentKomunitas.slotTerisi.toFloat() / currentKomunitas.totalSlot.toFloat() },
+                            modifier = Modifier.weight(1f).height(10.dp).clip(CircleShape),
+                            color = Color.Red,
+                            trackColor = BlackSolid.copy(alpha = 0.1f)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "${currentKomunitas.slotTerisi}/${currentKomunitas.totalSlot} slot",
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text("Tentang Kegiatan", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = BlackSolid)
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Kegiatan bersih-bersih pantai bersama komunitas peduli lingkungan. Peserta diharapkan membawa semangat dan siap menjaga kebersihan pesisir Lampung.",
+                        fontSize = 13.sp,
+                        color = BlackSolid.copy(alpha = 0.6f),
+                        lineHeight = 18.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text("Penyelenggara", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = BlackSolid)
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 10.dp)) {
+                        Surface(modifier = Modifier.size(42.dp), shape = CircleShape, color = GreenDeep) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text("GH", color = GoldYellow, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(currentKomunitas.penyelenggara, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = GreenDeep)
+                            Text("Verified Community", fontSize = 12.sp, color = BlackSolid.copy(alpha = 0.5f))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text("Kamu Sudah Terdaftar", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = BlackSolid)
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)) {
+                        Box(modifier = Modifier.size(14.dp).clip(CircleShape).background(GoldYellow))
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text("Partisipasi Aktif", color = GreenDeep, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                isCancelling = true
+                                delay(2000)
+                                viewModel.kurangiPartisipan(currentKomunitas.judul)
+                                isCancelling = false
+                                navController.popBackStack()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(54.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        shape = RoundedCornerShape(14.dp),
+                        enabled = !isCancelling
+                    ) {
+                        if (isCancelling) {
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                        } else {
+                            Text("Batalkan", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(40.dp))
+                }
+            }
+
+            if (isCancelling) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f))
+                        .clickable(enabled = false) {},
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = GoldYellow)
+                }
             }
         }
     }

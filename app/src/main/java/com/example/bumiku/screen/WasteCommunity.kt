@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,50 +35,44 @@ fun WasteCommunity(
     var isLoading by remember { mutableStateOf(false) }
     val listTampil = viewModel.filteredKomunitas
 
-    Scaffold(
-        topBar = { 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             HeaderSection(
                 onBackClick = { navController.popBackStack() },
                 onHistoryClick = { navController.navigate("history_wcom") }
-            ) 
-        },
-        bottomBar = { BottomNavigationBar() }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color.White)
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                FilterCategorySection(
-                    selectedCategory = viewModel.selectedCategory,
-                    onCategorySelected = { viewModel.selectedCategory = it }
-                )
+            )
+            
+            FilterCategorySection(
+                selectedCategory = viewModel.selectedCategory,
+                onCategorySelected = { viewModel.selectedCategory = it }
+            )
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    items(listTampil, key = { it.judul }) { komunitas ->
-                        CardKomunitas(
-                            komunitas = komunitas,
-                            onJoinClick = {
-                                scope.launch {
-                                    isLoading = true
-                                    viewModel.tambahPartisipan(komunitas.judul)
-                                    delay(500)
-                                    isLoading = false
-                                    navController.navigate("detail/${komunitas.judul}")
-                                }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                items(listTampil, key = { it.judul }) { komunitas ->
+                    CardKomunitas(
+                        komunitas = komunitas,
+                        onJoinClick = {
+                            scope.launch {
+                                isLoading = true
+                                viewModel.tambahPartisipan(komunitas.judul)
+                                delay(500)
+                                isLoading = false
+                                navController.navigate("detail/${komunitas.judul}")
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
-            if (isLoading) LoadingOverlay()
         }
+        if (isLoading) LoadingOverlay()
     }
 }
 
@@ -162,7 +156,7 @@ fun HeaderSection(onBackClick: () -> Unit, onHistoryClick: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
                 tint = GoldYellow,
                 modifier = Modifier
@@ -178,7 +172,7 @@ fun HeaderSection(onBackClick: () -> Unit, onHistoryClick: () -> Unit) {
                 modifier = Modifier.align(Alignment.Center)
             )
             Icon(
-                imageVector = Icons.Default.List,
+                imageVector = Icons.AutoMirrored.Filled.List,
                 contentDescription = "History",
                 tint = GoldYellow,
                 modifier = Modifier
@@ -214,16 +208,6 @@ fun InfoRow(iconRes: Int, text: String) {
         Icon(painterResource(iconRes), null, modifier = Modifier.size(14.dp), tint = GreenDeep)
         Spacer(modifier = Modifier.width(8.dp))
         Text(text, fontSize = 12.sp, color = BlackSolid.copy(alpha = 0.7f))
-    }
-}
-
-@Composable
-fun BottomNavigationBar() {
-    NavigationBar(containerColor = Color.White) {
-        val items = listOf("Beranda", "Challenge", "Notif", "Profil")
-        items.forEach { item ->
-            NavigationBarItem(selected = item == "Beranda", onClick = {}, icon = { Icon(painterResource(android.R.drawable.ic_menu_compass), null) }, label = { Text(item) })
-        }
     }
 }
 
