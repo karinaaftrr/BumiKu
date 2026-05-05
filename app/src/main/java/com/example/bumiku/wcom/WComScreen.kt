@@ -1,5 +1,6 @@
-package com.example.bumiku.screen
+package com.example.bumiku.wcom
 
+import android.R
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -18,7 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.bumiku.model.Komunitas
+import com.example.bumiku.model.Community
+import com.example.bumiku.model.CommunitySource
 import com.example.bumiku.ui.theme.BlackSolid
 import com.example.bumiku.ui.theme.GoldYellow
 import com.example.bumiku.ui.theme.GreenDeep
@@ -27,7 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun WasteCommunity(
+fun WComScreen(
     navController: NavHostController,
     viewModel: KomunitasViewModel
 ) {
@@ -45,7 +47,7 @@ fun WasteCommunity(
                 onBackClick = { navController.popBackStack() },
                 onHistoryClick = { navController.navigate("history_wcom") }
             )
-            
+
             FilterCategorySection(
                 selectedCategory = viewModel.selectedCategory,
                 onCategorySelected = { viewModel.selectedCategory = it }
@@ -59,13 +61,15 @@ fun WasteCommunity(
                 items(listTampil, key = { it.judul }) { komunitas ->
                     CardKomunitas(
                         komunitas = komunitas,
+                        onCardClick = {
+                            navController.navigate("detail/${komunitas.judul}")
+                        },
                         onJoinClick = {
                             scope.launch {
                                 isLoading = true
                                 viewModel.tambahPartisipan(komunitas.judul)
                                 delay(500)
                                 isLoading = false
-                                navController.navigate("detail/${komunitas.judul}")
                             }
                         }
                     )
@@ -77,16 +81,22 @@ fun WasteCommunity(
 }
 
 @Composable
-fun CardKomunitas(komunitas: Komunitas, onJoinClick: () -> Unit) {
+fun CardKomunitas(komunitas: Community, onCardClick: () -> Unit, onJoinClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCardClick() },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = GoldYellow),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column {
-            Box(modifier = Modifier.fillMaxWidth().height(160.dp)) {
-                Image(
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+            ) {
+                androidx.compose.foundation.Image(
                     painter = painterResource(id = komunitas.gambar),
                     contentDescription = komunitas.judul,
                     modifier = Modifier.fillMaxSize(),
@@ -114,8 +124,8 @@ fun CardKomunitas(komunitas: Komunitas, onJoinClick: () -> Unit) {
                         color = BlackSolid
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    InfoRow(android.R.drawable.ic_menu_my_calendar, komunitas.tanggal)
-                    InfoRow(android.R.drawable.ic_menu_mylocation, komunitas.lokasi)
+                    InfoRow(R.drawable.ic_menu_my_calendar, komunitas.tanggal)
+                    InfoRow(R.drawable.ic_menu_mylocation, komunitas.lokasi)
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -132,12 +142,20 @@ fun CardKomunitas(komunitas: Komunitas, onJoinClick: () -> Unit) {
                             )
                         }
                         Button(
-                            onClick = onJoinClick,
-                            enabled = komunitas.slotTerisi < komunitas.totalSlot,
-                            colors = ButtonDefaults.buttonColors(containerColor = GreenDeep),
+                            onClick = {
+                                onJoinClick()
+                            },
+                            enabled = komunitas.slotTerisi < komunitas.totalSlot && !komunitas.isJoined,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = GreenDeep,
+                                disabledContainerColor = GreenDeep.copy(alpha = 0.4f)
+                            ),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Text(text = "Partisipasi", color = GoldYellow)
+                            Text(
+                                text = if (komunitas.isJoined) "Terdaftar" else "Partisipasi",
+                                color = GoldYellow
+                            )
                         }
                     }
                 }
@@ -153,7 +171,7 @@ fun HeaderSection(onBackClick: () -> Unit, onHistoryClick: () -> Unit) {
             modifier = Modifier
                 .statusBarsPadding()
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -168,7 +186,7 @@ fun HeaderSection(onBackClick: () -> Unit, onHistoryClick: () -> Unit) {
                 text = "WComm",
                 color = GoldYellow,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 modifier = Modifier.align(Alignment.Center)
             )
             Icon(
@@ -187,7 +205,10 @@ fun HeaderSection(onBackClick: () -> Unit, onHistoryClick: () -> Unit) {
 @Composable
 fun FilterCategorySection(selectedCategory: String, onCategorySelected: (String) -> Unit) {
     val categories = listOf("Semua", "Daur Ulang", "Bersih-Bersih", "Edukasi", "Tanam Pohon")
-    LazyRow(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         items(categories) { category ->
             val isSelected = category == selectedCategory
             Surface(
@@ -196,7 +217,11 @@ fun FilterCategorySection(selectedCategory: String, onCategorySelected: (String)
                 color = if (isSelected) GreenDeep else Color.Transparent,
                 border = if (isSelected) null else BorderStroke(1.dp, GoldYellow)
             ) {
-                Text(category, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), color = if (isSelected) GoldYellow else GreenDeep)
+                Text(
+                    category,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = if (isSelected) GoldYellow else GreenDeep
+                )
             }
         }
     }
@@ -204,7 +229,10 @@ fun FilterCategorySection(selectedCategory: String, onCategorySelected: (String)
 
 @Composable
 fun InfoRow(iconRes: Int, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 2.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 2.dp)
+    ) {
         Icon(painterResource(iconRes), null, modifier = Modifier.size(14.dp), tint = GreenDeep)
         Spacer(modifier = Modifier.width(8.dp))
         Text(text, fontSize = 12.sp, color = BlackSolid.copy(alpha = 0.7f))
@@ -213,7 +241,12 @@ fun InfoRow(iconRes: Int, text: String) {
 
 @Composable
 fun LoadingOverlay() {
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(0.4f)), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(0.4f)),
+        contentAlignment = Alignment.Center
+    ) {
         CircularProgressIndicator(color = GoldYellow)
     }
 }

@@ -1,9 +1,11 @@
 package com.example.bumiku.model
+
 import com.example.bumiku.R
 
-object KomunitasDetail {
+object CommunitySource {
     val daftarKomunitas = listOf(
-        Komunitas(
+        Community(
+            id = 1,
             judul = "Aksi Bersih Pantai Mutun",
             kategori = "Bersih-Bersih",
             slotTerisi = 73,
@@ -13,7 +15,8 @@ object KomunitasDetail {
             penyelenggara = "Green House Lampung",
             gambar = R.drawable.pantai_mutun
         ),
-        Komunitas(
+        Community(
+            id = 2,
             judul = "Workshop Daur Ulang Kertas Bekas",
             kategori = "Daur Ulang",
             slotTerisi = 48,
@@ -23,7 +26,8 @@ object KomunitasDetail {
             penyelenggara = "EkoKreatif Indonesia",
             gambar = R.drawable.kertas_bekas
         ),
-        Komunitas(
+        Community(
+            id = 3,
             judul = "Gerakan 1000 Pohon Mangrove",
             kategori = "Tanam Pohon",
             slotTerisi = 120,
@@ -33,7 +37,8 @@ object KomunitasDetail {
             penyelenggara = "Mangrove Lestari",
             gambar = R.drawable.hutan_mangrove
         ),
-        Komunitas(
+        Community(
+            id = 4,
             judul = "Seminar Pengelolaan Sampah Rumah Tangga",
             kategori = "Edukasi",
             slotTerisi = 100,

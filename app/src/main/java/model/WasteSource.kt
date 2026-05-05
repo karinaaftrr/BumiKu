@@ -14,7 +14,10 @@ object WasteSource {
             "plastik", "Plastik", "♻️", R.drawable.waste_plastik,
             "Limbah polimer sintetis yang sulit terurai dan memerlukan penanganan khusus.",
             listOf("Kantong Plastik", "Bungkus Makanan", "Botol Plastik"),
-            listOf("Cara Mendaur Ulang Kantong Plastik dengan Kerajinan", "Cara Membuat Pot dari Bungkus Makanan")
+            listOf(
+                "Cara Mendaur Ulang Kantong Plastik dengan Kerajinan",
+                "Cara Membuat Pot dari Bungkus Makanan"
+            )
         ),
         WasteCategory(
             "kertas", "Kertas", "📄", R.drawable.waste_kertas,

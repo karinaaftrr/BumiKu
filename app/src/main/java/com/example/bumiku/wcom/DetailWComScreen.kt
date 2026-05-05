@@ -1,11 +1,11 @@
-package com.example.bumiku.screen
+package com.example.bumiku.wcom
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,7 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.bumiku.model.Komunitas
+import com.example.bumiku.model.Community
+import com.example.bumiku.model.CommunitySource
 import com.example.bumiku.ui.theme.BlackSolid
 import com.example.bumiku.ui.theme.GoldYellow
 import com.example.bumiku.ui.theme.GreenDeep
@@ -28,13 +29,13 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DetailWCom(
-    komunitas: Komunitas,
+    komunitas: Community,
     navController: NavHostController,
     viewModel: KomunitasViewModel
 ) {
     val currentKomunitas = viewModel.listKomunitas.find { it.judul == komunitas.judul } ?: komunitas
     val scope = rememberCoroutineScope()
-    var isCancelling by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -43,10 +44,10 @@ fun DetailWCom(
                     modifier = Modifier
                         .statusBarsPadding()
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
                         tint = GoldYellow,
                         modifier = Modifier
@@ -58,7 +59,7 @@ fun DetailWCom(
                         text = "WComm",
                         color = GoldYellow,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -137,7 +138,10 @@ fun DetailWCom(
                         Spacer(modifier = Modifier.width(8.dp))
                         LinearProgressIndicator(
                             progress = { currentKomunitas.slotTerisi.toFloat() / currentKomunitas.totalSlot.toFloat() },
-                            modifier = Modifier.weight(1f).height(10.dp).clip(CircleShape),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(10.dp)
+                                .clip(CircleShape),
                             color = Color.Red,
                             trackColor = BlackSolid.copy(alpha = 0.1f)
                         )
@@ -164,7 +168,10 @@ fun DetailWCom(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Text("Penyelenggara", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = BlackSolid)
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 10.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 10.dp)
+                    ) {
                         Surface(modifier = Modifier.size(42.dp), shape = CircleShape, color = GreenDeep) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text("GH", color = GoldYellow, fontWeight = FontWeight.Bold)
@@ -172,41 +179,88 @@ fun DetailWCom(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text(currentKomunitas.penyelenggara, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = GreenDeep)
-                            Text("Verified Community", fontSize = 12.sp, color = BlackSolid.copy(alpha = 0.5f))
+                            Text(
+                                currentKomunitas.penyelenggara,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                color = GreenDeep
+                            )
+                            Text(
+                                "Verified Community",
+                                fontSize = 12.sp,
+                                color = BlackSolid.copy(alpha = 0.5f)
+                            )
                         }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Text("Kamu Sudah Terdaftar", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = BlackSolid)
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)) {
-                        Box(modifier = Modifier.size(14.dp).clip(CircleShape).background(GoldYellow))
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text("Partisipasi Aktif", color = GreenDeep, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                    }
+                    if (currentKomunitas.isJoined) {
+                        Text("Kamu Sudah Terdaftar", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = BlackSolid)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .clip(CircleShape)
+                                    .background(GoldYellow)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text("Partisipasi Aktif", color = GreenDeep, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        }
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(32.dp))
 
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                isCancelling = true
-                                delay(2000)
-                                viewModel.kurangiPartisipan(currentKomunitas.judul)
-                                isCancelling = false
-                                navController.popBackStack()
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    isLoading = true
+                                    delay(2000)
+                                    viewModel.kurangiPartisipan(currentKomunitas.judul)
+                                    isLoading = false
+                                    navController.popBackStack()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                            shape = RoundedCornerShape(14.dp),
+                            enabled = !isLoading
+                        ) {
+                            if (isLoading) {
+                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                            } else {
+                                Text("Batalkan", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
                             }
-                        },
-                        modifier = Modifier.fillMaxWidth().height(54.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                        shape = RoundedCornerShape(14.dp),
-                        enabled = !isCancelling
-                    ) {
-                        if (isCancelling) {
-                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-                        } else {
-                            Text("Batalkan", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    isLoading = true
+                                    viewModel.tambahPartisipan(currentKomunitas.judul)
+                                    delay(1000)
+                                    isLoading = false
+                                    navController.popBackStack()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = GreenDeep),
+                            shape = RoundedCornerShape(14.dp),
+                            enabled = !isLoading && currentKomunitas.slotTerisi < currentKomunitas.totalSlot
+                        ) {
+                            if (isLoading) {
+                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                            } else {
+                                Text("Partisipasi", color = GoldYellow, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                            }
                         }
                     }
 
@@ -214,7 +268,7 @@ fun DetailWCom(
                 }
             }
 
-            if (isCancelling) {
+            if (isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -231,8 +285,16 @@ fun DetailWCom(
 
 @Composable
 fun DetailInfoItem(iconRes: Int, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
-        Icon(painter = painterResource(id = iconRes), contentDescription = null, modifier = Modifier.size(18.dp), tint = BlackSolid.copy(alpha = 0.4f))
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = BlackSolid.copy(alpha = 0.4f)
+        )
         Spacer(modifier = Modifier.width(12.dp))
         Text(text = text, fontSize = 13.sp, color = BlackSolid.copy(alpha = 0.6f))
     }

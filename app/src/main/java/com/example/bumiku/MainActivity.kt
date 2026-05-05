@@ -6,10 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,6 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.bumiku.ui.theme.BumiKuTheme
 import com.example.bumiku.navigation.SetupNavGraph
+import com.example.bumiku.navigation.Screen
 import com.example.bumiku.viewmodel.KomunitasViewModel
 import com.example.bumiku.ui.theme.GoldYellow
 import com.example.bumiku.ui.theme.GreenDeep
@@ -38,7 +35,9 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     bottomBar = {
-                        if (currentRoute == "dashboard" || currentRoute == "notification" || currentRoute == "profil") {
+                        if (currentRoute == Screen.Dashboard.route || 
+                            currentRoute == Screen.Notifications.route || 
+                            currentRoute == Screen.Profile.route) {
                             GlobalBottomNavigationBar(navController, currentRoute)
                         }
                     }
@@ -58,34 +57,36 @@ class MainActivity : ComponentActivity() {
 fun GlobalBottomNavigationBar(navController: NavHostController, currentRoute: String?) {
     NavigationBar(containerColor = Color.White) {
         val items = listOf(
-            NavigationItem("Beranda", "dashboard", Icons.Default.Home),
-            NavigationItem("Notifikasi", "notification", Icons.Default.Notifications),
-            NavigationItem("Profil", "profil", Icons.Default.Person)
+            Screen.Dashboard,
+            Screen.Notifications,
+            Screen.Profile
         )
-        items.forEach { item ->
+        items.forEach { screen ->
             NavigationBarItem(
-                selected = currentRoute == item.route,
+                selected = currentRoute == screen.route,
                 onClick = {
-                    if (currentRoute != item.route) {
-                        navController.navigate(item.route) {
-                            popUpTo("dashboard") { saveState = true }
+                    if (currentRoute != screen.route) {
+                        navController.navigate(screen.route) {
+                            popUpTo(Screen.Dashboard.route) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
                     }
                 },
                 icon = { 
-                    Icon(
-                        imageVector = item.icon, 
-                        contentDescription = item.label, 
-                        modifier = Modifier.size(24.dp),
-                        tint = if (currentRoute == item.route) GreenDeep else Color.Gray
-                    ) 
+                    screen.icon?.let {
+                        Icon(
+                            imageVector = it, 
+                            contentDescription = screen.label, 
+                            modifier = Modifier.size(24.dp),
+                            tint = if (currentRoute == screen.route) GreenDeep else Color.Gray
+                        )
+                    }
                 },
                 label = { 
                     Text(
-                        item.label, 
-                        color = if (currentRoute == item.route) GreenDeep else Color.Gray,
+                        screen.label, 
+                        color = if (currentRoute == screen.route) GreenDeep else Color.Gray,
                         style = MaterialTheme.typography.labelSmall
                     ) 
                 },
@@ -96,5 +97,3 @@ fun GlobalBottomNavigationBar(navController: NavHostController, currentRoute: St
         }
     }
 }
-
-data class NavigationItem(val label: String, val route: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)

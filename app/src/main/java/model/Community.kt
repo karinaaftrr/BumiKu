@@ -1,6 +1,9 @@
 package com.example.bumiku.model
+
 import androidx.annotation.DrawableRes
-data class Komunitas(
+
+data class Community(
+    val id: Int,
     val judul: String,
     val kategori: String,
     val tanggal: String,

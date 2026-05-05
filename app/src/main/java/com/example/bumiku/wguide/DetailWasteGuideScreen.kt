@@ -1,4 +1,4 @@
-package com.example.bumiku.screen
+package com.example.bumiku.wguide
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -25,50 +26,64 @@ import com.example.bumiku.ui.theme.BlackSolid
 import com.example.bumiku.ui.theme.GoldYellow
 import com.example.bumiku.ui.theme.GreenDeep
 
+private sealed class GuideDetailState {
+    object Main : GuideDetailState()
+    object AllManagement : GuideDetailState()
+    object AllRecycling : GuideDetailState()
+    data class Material(val name: String, val label: String) : GuideDetailState()
+}
+
 @Composable
 fun DetailWasteGuideScreen(category: WasteCategory, navController: NavController) {
-    var selectedMaterial by remember { mutableStateOf<Pair<String, String>?>(null) }
-    var showAllManagement by remember { mutableStateOf(false) }
-    var showAllRecycling by remember { mutableStateOf(false) }
+    val screenState = remember { mutableStateOf<GuideDetailState>(GuideDetailState.Main) }
 
-    if (selectedMaterial != null) {
-        MaterialScreen(
-            category = category,
-            title = selectedMaterial!!.first,
-            sectionLabel = selectedMaterial!!.second,
-            onBack = { selectedMaterial = null }
-        )
-        return
+    when (val state = screenState.value) {
+        is GuideDetailState.Main -> {
+            MainDetailContent(
+                category = category,
+                navController = navController,
+                onShowManagement = { screenState.value = GuideDetailState.AllManagement },
+                onShowRecycling = { screenState.value = GuideDetailState.AllRecycling },
+                onSelectItem = { name, label -> screenState.value = GuideDetailState.Material(name, label) }
+            )
+        }
+        is GuideDetailState.AllManagement -> {
+            AllItemsScreen(
+                category = category,
+                items = category.managementItems,
+                sectionTitle = "Semua Cara Pengelolaan",
+                onBack = { screenState.value = GuideDetailState.Main },
+                onItemClick = { name -> screenState.value = GuideDetailState.Material(name, "Cara Pengelolaan") }
+            )
+        }
+        is GuideDetailState.AllRecycling -> {
+            AllItemsScreen(
+                category = category,
+                items = category.recyclingTips,
+                sectionTitle = "Semua Tips Daur Ulang",
+                onBack = { screenState.value = GuideDetailState.Main },
+                onItemClick = { name -> screenState.value = GuideDetailState.Material(name, "Tips Daur Ulang") }
+            )
+        }
+        is GuideDetailState.Material -> {
+            MaterialScreen(
+                category = category,
+                title = state.name,
+                sectionLabel = state.label,
+                onBack = { screenState.value = GuideDetailState.Main }
+            )
+        }
     }
+}
 
-    if (showAllManagement) {
-        AllItemsScreen(
-            category = category,
-            items = category.managementItems,
-            sectionTitle = "Semua Cara Pengelolaan",
-            onBack = { showAllManagement = false },
-            onItemClick = { name ->
-                showAllManagement = false
-                selectedMaterial = Pair(name, "Cara Pengelolaan")
-            }
-        )
-        return
-    }
-
-    if (showAllRecycling) {
-        AllItemsScreen(
-            category = category,
-            items = category.recyclingTips,
-            sectionTitle = "Semua Tips Daur Ulang",
-            onBack = { showAllRecycling = false },
-            onItemClick = { name ->
-                showAllRecycling = false
-                selectedMaterial = Pair(name, "Tips Daur Ulang")
-            }
-        )
-        return
-    }
-
+@Composable
+private fun MainDetailContent(
+    category: WasteCategory,
+    navController: NavController,
+    onShowManagement: () -> Unit,
+    onShowRecycling: () -> Unit,
+    onSelectItem: (String, String) -> Unit
+) {
     Scaffold(
         topBar = {
             Surface(color = GreenDeep, modifier = Modifier.fillMaxWidth()) {
@@ -76,7 +91,7 @@ fun DetailWasteGuideScreen(category: WasteCategory, navController: NavController
                     modifier = Modifier
                         .statusBarsPadding()
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -90,8 +105,12 @@ fun DetailWasteGuideScreen(category: WasteCategory, navController: NavController
                     Text(
                         text = category.name,
                         color = GoldYellow,
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
-                        modifier = Modifier.align(Alignment.Center)
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(horizontal = 48.dp)
                     )
                 }
             }
@@ -143,14 +162,14 @@ fun DetailWasteGuideScreen(category: WasteCategory, navController: NavController
                             text = "Lihat semua",
                             style = MaterialTheme.typography.labelSmall,
                             color = GreenDeep,
-                            modifier = Modifier.clickable { showAllManagement = true }
+                            modifier = Modifier.clickable { onShowManagement() }
                         )
                     }
                     Spacer(Modifier.height(8.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         itemsIndexed(category.managementItems) { _, itemName ->
                             ManagementCard(name = itemName, imageRes = category.imageRes) {
-                                selectedMaterial = Pair(itemName, "Cara Pengelolaan")
+                                onSelectItem(itemName, "Cara Pengelolaan")
                             }
                         }
                     }
@@ -167,14 +186,14 @@ fun DetailWasteGuideScreen(category: WasteCategory, navController: NavController
                             text = "Lihat semua",
                             style = MaterialTheme.typography.labelSmall,
                             color = GreenDeep,
-                            modifier = Modifier.clickable { showAllRecycling = true }
+                            modifier = Modifier.clickable { onShowRecycling() }
                         )
                     }
                 }
 
                 itemsIndexed(category.recyclingTips) { _, tip ->
                     RecyclingTipCard(title = tip, imageRes = category.imageRes) {
-                        selectedMaterial = Pair(tip, "Tips Daur Ulang")
+                        onSelectItem(tip, "Tips Daur Ulang")
                     }
                 }
 
@@ -185,7 +204,7 @@ fun DetailWasteGuideScreen(category: WasteCategory, navController: NavController
 }
 
 @Composable
-fun MaterialScreen(
+private fun MaterialScreen(
     category: WasteCategory,
     title: String,
     sectionLabel: String,
@@ -213,7 +232,11 @@ fun MaterialScreen(
                         text = title,
                         color = GoldYellow,
                         style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-                        modifier = Modifier.align(Alignment.Center)
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(horizontal = 48.dp)
                     )
                 }
             }
@@ -335,7 +358,7 @@ fun MaterialScreen(
 }
 
 @Composable
-fun AllItemsScreen(
+private fun AllItemsScreen(
     category: WasteCategory,
     items: List<String>,
     sectionTitle: String,
@@ -364,7 +387,11 @@ fun AllItemsScreen(
                         text = sectionTitle,
                         color = GoldYellow,
                         style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-                        modifier = Modifier.align(Alignment.Center)
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(horizontal = 48.dp)
                     )
                 }
             }
@@ -397,7 +424,7 @@ fun AllItemsScreen(
 }
 
 @Composable
-fun ManagementCard(name: String, imageRes: Int, onClick: () -> Unit) {
+private fun ManagementCard(name: String, imageRes: Int, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(150.dp)
@@ -434,7 +461,7 @@ fun ManagementCard(name: String, imageRes: Int, onClick: () -> Unit) {
 }
 
 @Composable
-fun RecyclingTipCard(title: String, imageRes: Int, onClick: () -> Unit) {
+private fun RecyclingTipCard(title: String, imageRes: Int, onClick: () -> Unit) {
     Card(
         Modifier
             .fillMaxWidth()

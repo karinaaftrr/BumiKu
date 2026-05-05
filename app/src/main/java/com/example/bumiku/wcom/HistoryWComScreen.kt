@@ -1,12 +1,13 @@
-package com.example.bumiku.screen
+package com.example.bumiku.wcom
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,7 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.bumiku.model.Komunitas
+import com.example.bumiku.model.Community
+import com.example.bumiku.model.CommunitySource
 import com.example.bumiku.ui.theme.BlackSolid
 import com.example.bumiku.ui.theme.GoldYellow
 import com.example.bumiku.ui.theme.GreenDeep
@@ -39,10 +41,10 @@ fun HistoryWCom(
                     modifier = Modifier
                         .statusBarsPadding()
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
                         tint = GoldYellow,
                         modifier = Modifier
@@ -53,8 +55,7 @@ fun HistoryWCom(
                     Text(
                         text = "History",
                         color = GoldYellow,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -69,7 +70,11 @@ fun HistoryWCom(
         ) {
             if (joinedKomunitas.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Belum ada partisipasi aktif", color = BlackSolid.copy(alpha = 0.5f))
+                    Text(
+                        text = "Belum ada partisipasi aktif",
+                        color = BlackSolid.copy(alpha = 0.5f),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             } else {
                 LazyColumn(
@@ -92,7 +97,7 @@ fun HistoryWCom(
 }
 
 @Composable
-fun HistoryCard(komunitas: Komunitas, onClick: () -> Unit) {
+fun HistoryCard(komunitas: Community, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -125,32 +130,37 @@ fun HistoryCard(komunitas: Komunitas, onClick: () -> Unit) {
                     Text(
                         text = komunitas.kategori,
                         color = GoldYellow,
-                        fontSize = 10.sp,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp
+                        )
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = komunitas.judul,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = BlackSolid
+                    color = BlackSolid,
+                    style = MaterialTheme.typography.titleSmall
                 )
                 Text(
                     text = komunitas.tanggal,
-                    fontSize = 11.sp,
-                    color = BlackSolid.copy(alpha = 0.6f)
+                    color = BlackSolid.copy(alpha = 0.6f),
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(8.dp).clip(androidx.compose.foundation.shape.CircleShape).background(GoldYellow))
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(GoldYellow)
+                    )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "Partisipasi Aktif",
                         color = GreenDeep,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
                     )
                 }
             }

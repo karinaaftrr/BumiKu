@@ -15,15 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.bumiku.model.Notifikasi
-import com.example.bumiku.model.NotifikasiSource
+import com.example.bumiku.model.Notification
+import com.example.bumiku.model.NotificationSource
 import com.example.bumiku.ui.theme.GreenDeep
 import com.example.bumiku.ui.theme.GoldYellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationScreen(onBackClick: () -> Unit) {
-    val notifications = NotifikasiSource.dummyNotifications
+    val notifications = NotificationSource.dummyNotifications
 
     Scaffold(
         containerColor = Color.White,
@@ -65,7 +65,7 @@ fun NotificationScreen(onBackClick: () -> Unit) {
 }
 
 @Composable
-fun NotificationCard(notification: Notifikasi) {
+fun NotificationCard(notification: Notification) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

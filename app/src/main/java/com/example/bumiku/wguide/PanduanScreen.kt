@@ -1,4 +1,4 @@
-package com.example.bumiku.screen
+package com.example.bumiku.wguide
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bumiku.ui.theme.GoldYellow
@@ -26,7 +27,15 @@ fun PanduanScreen(onBackClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Panduan Penggunaan", color = GoldYellow, fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        text = "Panduan Penggunaan",
+                        color = GoldYellow,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = GoldYellow)
@@ -51,7 +60,7 @@ fun PanduanScreen(onBackClick: () -> Unit) {
                 color = GreenDeep
             )
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             PanduanItem(
                 step = "1",
                 title = "Dashboard",

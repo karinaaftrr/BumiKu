@@ -22,7 +22,6 @@ import com.example.bumiku.ui.theme.GreenDeep
 @Composable
 fun OnboardingScreen(onGetStartedClick: () -> Unit = {}) {
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFE5E5E5))) {
-        // Background Image
         Image(
             painter = painterResource(id = R.drawable.sampah),
             contentDescription = null,
@@ -31,8 +30,6 @@ fun OnboardingScreen(onGetStartedClick: () -> Unit = {}) {
                 .fillMaxHeight(0.65f),
             contentScale = ContentScale.Crop
         )
-
-        // White card at the bottom
         Surface(
             modifier = Modifier
                 .fillMaxWidth()

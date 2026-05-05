@@ -1,4 +1,4 @@
-package com.example.bumiku.screen
+package com.example.bumiku.wguide
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -41,7 +41,7 @@ fun WasteGuideScreen(navController: NavController) {
                     modifier = Modifier
                         .statusBarsPadding()
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -53,10 +53,10 @@ fun WasteGuideScreen(navController: NavController) {
                             .clickable { navController.popBackStack() }
                     )
                     Text(
-                        text = "Waste Guide",
+                        text = "WGuide",
                         color = GoldYellow,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }

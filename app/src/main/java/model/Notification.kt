@@ -1,6 +1,6 @@
 package com.example.bumiku.model
 
-data class Notifikasi(
+data class Notification(
     val id: Int,
     val title: String,
     val message: String,

@@ -1,5 +1,6 @@
-package com.example.bumiku.screen
+package com.example.bumiku.wnews
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,42 +21,53 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.bumiku.model.News
-import com.example.bumiku.model.NewsDetail
-import com.example.bumiku.ui.theme.*
+import com.example.bumiku.model.NewsSource
+import com.example.bumiku.ui.theme.BlackSolid
+import com.example.bumiku.ui.theme.GoldYellow
+import com.example.bumiku.ui.theme.GreenDeep
 
 @Composable
 fun WNewsScreen(navController: NavController) {
-    val newsList = NewsDetail.dummyNews
+
+    val newsList = NewsSource.dummyNews
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        Surface(color = GreenDeep, modifier = Modifier.fillMaxWidth()) {
+
+        Surface(
+            color = GreenDeep,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
             Box(
                 modifier = Modifier
                     .statusBarsPadding()
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
+
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = null,
                     tint = GoldYellow,
                     modifier = Modifier
                         .size(28.dp)
                         .align(Alignment.CenterStart)
-                        .clickable { navController.popBackStack() }
+                        .clickable {
+                            navController.popBackStack()
+                        }
                 )
+
                 Text(
                     text = "WNews",
                     color = GoldYellow,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
                 )
             }
         }
@@ -65,9 +77,15 @@ fun WNewsScreen(navController: NavController) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
             items(newsList) { news ->
-                NewsItem(news = news)
+
+                NewsItem(
+                    news = news,
+                    navController = navController
+                )
             }
+
             item {
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -76,40 +94,65 @@ fun WNewsScreen(navController: NavController) {
 }
 
 @Composable
-private fun NewsItem(news: News) {
+private fun NewsItem(
+    news: News,
+    navController: NavController
+) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { },
+            .clickable {
+                navController.navigate("detail_news/${news.id}")
+            },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
         elevation = CardDefaults.cardElevation(2.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, BlackSolid.copy(alpha = 0.1f))
+        border = BorderStroke(
+            1.dp,
+            BlackSolid.copy(alpha = 0.1f)
+        )
     ) {
+
         Column {
+
             Image(
                 painter = painterResource(id = news.gambar),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 16.dp,
+                            topEnd = 16.dp
+                        )
+                    ),
                 contentScale = ContentScale.Crop
             )
 
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+
                 Text(
                     text = news.date,
                     style = MaterialTheme.typography.labelSmall,
                     color = GreenDeep.copy(alpha = 0.6f)
                 )
+
                 Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
                     text = news.title,
                     style = MaterialTheme.typography.titleMedium,
                     color = BlackSolid
                 )
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = news.content,
                     style = MaterialTheme.typography.bodyMedium,
@@ -117,10 +160,14 @@ private fun NewsItem(news: News) {
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+
                 Spacer(modifier = Modifier.height(12.dp))
+
                 Text(
                     text = "Baca Selengkapnya",
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
                     color = GreenDeep
                 )
             }

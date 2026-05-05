@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -214,7 +215,7 @@ fun ProfilScreen(navController: NavHostController) {
         Column(modifier = Modifier.padding(horizontal = 20.dp)) {
             ProfileSectionTitle(title = "Informasi & Panduan")
             ProfileMenuItem(
-                icon = Icons.Default.MenuBook,
+                icon = Icons.AutoMirrored.Filled.MenuBook,
                 label = "Edukasi & Panduan",
                 onClick = { navController.navigate(Screen.Panduan.route) }
             )
