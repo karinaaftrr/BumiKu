@@ -19,6 +19,7 @@ import com.example.bumiku.ui.theme.BumiKuTheme
 import com.example.bumiku.navigation.SetupNavGraph
 import com.example.bumiku.navigation.Screen
 import com.example.bumiku.viewmodel.KomunitasViewModel
+import com.example.bumiku.viewmodel.AuthViewModel
 import com.example.bumiku.ui.theme.GoldYellow
 import com.example.bumiku.ui.theme.GreenDeep
 
@@ -29,23 +30,34 @@ class MainActivity : ComponentActivity() {
         setContent {
             BumiKuTheme {
                 val navController = rememberNavController()
-                val viewModel: KomunitasViewModel = viewModel()
+                val komunitasViewModel: KomunitasViewModel = viewModel()
+                val authViewModel: AuthViewModel = viewModel()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 Scaffold(
                     bottomBar = {
-                        if (currentRoute == Screen.Dashboard.route || 
-                            currentRoute == Screen.Notifications.route || 
+                        if (currentRoute == Screen.Dashboard.route ||
+                            currentRoute == Screen.Notifications.route ||
                             currentRoute == Screen.Profile.route) {
                             GlobalBottomNavigationBar(navController, currentRoute)
                         }
                     }
                 ) { innerPadding ->
+                    val isFullScreenRoute = currentRoute == Screen.Onboarding.route ||
+                            currentRoute == Screen.Login.route ||
+                            currentRoute == Screen.Register.route ||
+                            currentRoute == null
+
                     SetupNavGraph(
                         navController = navController,
-                        viewModel = viewModel,
-                        modifier = Modifier.padding(innerPadding)
+                        komunitasViewModel = komunitasViewModel,
+                        authViewModel = authViewModel,
+                        modifier = if (isFullScreenRoute) {
+                            Modifier
+                        } else {
+                            Modifier.padding(innerPadding)
+                        }
                     )
                 }
             }
@@ -73,22 +85,22 @@ fun GlobalBottomNavigationBar(navController: NavHostController, currentRoute: St
                         }
                     }
                 },
-                icon = { 
+                icon = {
                     screen.icon?.let {
                         Icon(
-                            imageVector = it, 
-                            contentDescription = screen.label, 
+                            imageVector = it,
+                            contentDescription = screen.label,
                             modifier = Modifier.size(24.dp),
                             tint = if (currentRoute == screen.route) GreenDeep else Color.Gray
                         )
                     }
                 },
-                label = { 
+                label = {
                     Text(
-                        screen.label, 
+                        screen.label,
                         color = if (currentRoute == screen.route) GreenDeep else Color.Gray,
                         style = MaterialTheme.typography.labelSmall
-                    ) 
+                    )
                 },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = GoldYellow.copy(alpha = 0.2f)

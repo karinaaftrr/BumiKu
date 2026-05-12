@@ -1,6 +1,7 @@
 package com.example.bumiku.wguide
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -14,35 +15,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bumiku.ui.theme.GoldYellow
 import com.example.bumiku.ui.theme.GreenDeep
 import com.example.bumiku.ui.theme.BlackSolid
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PanduanScreen(onBackClick: () -> Unit) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
+            Surface(
+                color = GreenDeep,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Kembali",
+                        tint = GoldYellow,
+                        modifier = Modifier
+                            .size(28.dp)
+                            .align(Alignment.CenterStart)
+                            .clickable { onBackClick() }
+                    )
                     Text(
                         text = "Panduan Penggunaan",
+                        style = MaterialTheme.typography.titleLarge,
                         color = GoldYellow,
                         fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        modifier = Modifier.align(Alignment.Center)
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = GoldYellow)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenDeep)
-            )
+                }
+            }
         }
     ) { innerPadding ->
         Column(

@@ -39,9 +39,9 @@ fun WasteGuideScreen(navController: NavController) {
             Surface(color = GreenDeep, modifier = Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
-                        .statusBarsPadding()
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -112,7 +112,10 @@ fun WasteGuideScreen(navController: NavController) {
 @Composable
 fun CategoryCard(cat: WasteCategory, modifier: Modifier, onClick: () -> Unit) {
     Card(
-        modifier = modifier.clickable { onClick() },
+        modifier = modifier
+            .width(180.dp)
+            .height(200.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(2.dp)
@@ -141,7 +144,8 @@ fun CategoryCard(cat: WasteCategory, modifier: Modifier, onClick: () -> Unit) {
                 contentDescription = cat.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(150.dp)
+                    .width(30.dp)
                     .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
                 contentScale = ContentScale.Crop
             )

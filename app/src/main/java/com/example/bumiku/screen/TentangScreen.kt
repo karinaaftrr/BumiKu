@@ -1,6 +1,7 @@
 package com.example.bumiku.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,20 +21,38 @@ import com.example.bumiku.ui.theme.GoldYellow
 import com.example.bumiku.ui.theme.GreenDeep
 import com.example.bumiku.ui.theme.BlackSolid
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TentangScreen(onBackClick: () -> Unit) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Tentang BumiKu", color = GoldYellow, fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = GoldYellow)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenDeep)
-            )
+            Surface(
+                color = GreenDeep,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Kembali",
+                        tint = GoldYellow,
+                        modifier = Modifier
+                            .size(28.dp)
+                            .align(Alignment.CenterStart)
+                            .clickable { onBackClick() }
+                    )
+                    Text(
+                        text = "Tentang BumiKu",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = GoldYellow,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
         }
     ) { innerPadding ->
         Column(

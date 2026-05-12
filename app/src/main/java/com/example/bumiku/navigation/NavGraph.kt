@@ -1,5 +1,6 @@
 package com.example.bumiku.navigation
 
+import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -7,6 +8,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,6 +17,7 @@ import androidx.navigation.navArgument
 import com.example.bumiku.dashboard.DashboardScreen
 import com.example.bumiku.model.WasteSource
 import com.example.bumiku.screen.*
+import com.example.bumiku.viewmodel.AuthViewModel
 import com.example.bumiku.viewmodel.KomunitasViewModel
 import com.example.bumiku.wcom.DetailWCom
 import com.example.bumiku.wcom.HistoryWCom
@@ -33,6 +36,8 @@ sealed class Screen(
     val icon: ImageVector? = null
 ) {
     object Onboarding : Screen("onboarding")
+    object Login : Screen("login")
+    object Register : Screen("register")
     object Dashboard : Screen("dashboard", "Beranda", Icons.Default.Home)
     object Notifications : Screen("notification", "Notifikasi", Icons.Default.Notifications)
     object WasteCommunity : Screen("waste_community", "WComm")
@@ -41,6 +46,7 @@ sealed class Screen(
     object Tracker : Screen("tracker")
     object News : Screen("wnews")
     object Profile : Screen("profil", "Profil", Icons.Default.Person)
+    object EditAccount : Screen("edit_akun")
     object Panduan : Screen("panduan")
     object FAQ : Screen("faq")
     object Tentang : Screen("tentang")
@@ -49,9 +55,11 @@ sealed class Screen(
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-    viewModel: KomunitasViewModel,
+    komunitasViewModel: KomunitasViewModel,
+    authViewModel: AuthViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
 
     NavHost(
         navController = navController,
@@ -60,24 +68,79 @@ fun SetupNavGraph(
     ) {
 
         composable(route = Screen.Onboarding.route) {
-
             OnboardingScreen(
-                onGetStartedClick = {
+                onLoginSuccess = { email, password ->
+                    if (authViewModel.login(email, password)) {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.Onboarding.route) {
+                                inclusive = true
+                            }
+                        }
+                    } else {
+                        Toast.makeText(
+                            context,
+                            authViewModel.errorMessage ?: "Login Gagal",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
 
+                onRegisterSuccess = {
+                    navController.navigate(Screen.Register.route)
+                },
+
+                isLoading = authViewModel.isLoading
+            )
+        }
+
+        composable(route = Screen.Login.route) {
+            LoginScreen(
+                onLoginSuccess = { email, password ->
+                    if (authViewModel.login(email, password)) {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.Login.route) {
+                                inclusive = true
+                            }
+                        }
+                    } else {
+                        Toast.makeText(
+                            context,
+                            authViewModel.errorMessage ?: "Login Gagal",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+
+                onRegisterClick = {
+                    navController.navigate(Screen.Register.route)
+                },
+
+                isLoading = authViewModel.isLoading
+            )
+        }
+
+        composable(route = Screen.Register.route) {
+            RegisterScreen(
+                onRegisterSuccess = {
                     navController.navigate(Screen.Dashboard.route) {
-                        popUpTo(Screen.Onboarding.route) {
+                        popUpTo(Screen.Register.route) {
                             inclusive = true
                         }
                     }
+                },
+
+                onLoginClick = {
+                    navController.navigate(Screen.Login.route)
                 }
             )
         }
 
         composable(route = Screen.Dashboard.route) {
-
             DashboardScreen(
                 navController = navController,
-                viewModel = viewModel,
+                viewModel = komunitasViewModel,
+                authViewModel = authViewModel,
+
                 onNotificationClick = {
                     navController.navigate(Screen.Notifications.route)
                 }
@@ -85,7 +148,6 @@ fun SetupNavGraph(
         }
 
         composable(route = Screen.Notifications.route) {
-
             NotificationScreen(
                 onBackClick = {
                     navController.popBackStack()
@@ -94,46 +156,38 @@ fun SetupNavGraph(
         }
 
         composable(route = Screen.WasteCommunity.route) {
-
             WComScreen(
                 navController = navController,
-                viewModel = viewModel
+                viewModel = komunitasViewModel
             )
         }
 
         composable(route = "detail/{judul}") { backStackEntry ->
 
-            val judul =
-                backStackEntry.arguments?.getString("judul")
+            val judul = backStackEntry.arguments?.getString("judul")
 
-            val komunitas =
-                viewModel.listKomunitas.find {
-                    it.judul == judul
-                }
+            val komunitas = komunitasViewModel.listKomunitas.find {
+                it.judul == judul
+            }
 
             komunitas?.let { data ->
-
                 DetailWCom(
                     komunitas = data,
                     navController = navController,
-                    viewModel = viewModel
+                    viewModel = komunitasViewModel
                 )
             }
         }
 
         composable(route = Screen.History.route) {
-
             HistoryWCom(
                 navController = navController,
-                viewModel = viewModel
+                viewModel = komunitasViewModel
             )
         }
 
         composable(route = Screen.WasteGuide.route) {
-
-            WasteGuideScreen(
-                navController = navController
-            )
+            WasteGuideScreen(navController = navController)
         }
 
         composable(route = "guide_detail/{categoryId}") { backStackEntry ->
@@ -141,13 +195,11 @@ fun SetupNavGraph(
             val categoryId =
                 backStackEntry.arguments?.getString("categoryId")
 
-            val category =
-                WasteSource.categories.find {
-                    it.id == categoryId
-                }
+            val category = WasteSource.categories.find {
+                it.id == categoryId
+            }
 
             category?.let {
-
                 DetailWasteGuideScreen(
                     category = it,
                     navController = navController
@@ -156,10 +208,9 @@ fun SetupNavGraph(
         }
 
         composable(route = Screen.Tracker.route) {
-
             TrackerScreen(
                 navController = navController,
-                viewModel = viewModel
+                viewModel = komunitasViewModel
             )
         }
 
@@ -177,16 +228,13 @@ fun SetupNavGraph(
 
             TrackerDetailScreen(
                 navController = navController,
-                viewModel = viewModel,
+                viewModel = komunitasViewModel,
                 taskId = taskId
             )
         }
 
         composable(route = Screen.News.route) {
-
-            WNewsScreen(
-                navController = navController
-            )
+            WNewsScreen(navController = navController)
         }
 
         composable(
@@ -208,14 +256,21 @@ fun SetupNavGraph(
         }
 
         composable(route = Screen.Profile.route) {
-
             ProfilScreen(
-                navController = navController
+                navController = navController,
+                authViewModel = authViewModel,
+                komunitasViewModel = komunitasViewModel
+            )
+        }
+
+        composable(route = Screen.EditAccount.route) {
+            EditAkunScreen(
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
 
         composable(route = Screen.Panduan.route) {
-
             PanduanScreen(
                 onBackClick = {
                     navController.popBackStack()
@@ -224,7 +279,6 @@ fun SetupNavGraph(
         }
 
         composable(route = Screen.FAQ.route) {
-
             FaqScreen(
                 onBackClick = {
                     navController.popBackStack()
@@ -233,7 +287,6 @@ fun SetupNavGraph(
         }
 
         composable(route = Screen.Tentang.route) {
-
             TentangScreen(
                 onBackClick = {
                     navController.popBackStack()

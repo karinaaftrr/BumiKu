@@ -40,12 +40,15 @@ fun TrackerDetailScreen(navController: NavController, viewModel: KomunitasViewMo
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            Surface(color = GreenDeep, modifier = Modifier.fillMaxWidth()) {
+            Surface(
+                color = GreenDeep,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Box(
                     modifier = Modifier
-                        .statusBarsPadding()
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -76,7 +79,6 @@ fun TrackerDetailScreen(navController: NavController, viewModel: KomunitasViewMo
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Task Header Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -140,13 +142,11 @@ fun TrackerDetailScreen(navController: NavController, viewModel: KomunitasViewMo
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Steps
             task.steps.forEachIndexed { index, step ->
                 StepCard(stepNumber = index + 1, stepText = step)
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
-            // Tip Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()

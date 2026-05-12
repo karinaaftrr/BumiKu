@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,17 +38,20 @@ import com.example.bumiku.model.Feature
 import com.example.bumiku.model.FeatureSource
 import com.example.bumiku.model.Task
 import com.example.bumiku.ui.theme.*
+import com.example.bumiku.viewmodel.AuthViewModel
 import com.example.bumiku.viewmodel.KomunitasViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.example.bumiku.navigation.Screen
 
 @Composable
 fun DashboardScreen(
     navController: NavHostController,
     viewModel: KomunitasViewModel,
+    authViewModel: AuthViewModel,
     onNotificationClick: () -> Unit = {}
 ) {
-
+    val user = authViewModel.currentUser
     val scope = rememberCoroutineScope()
 
     var isLoading by remember { mutableStateOf(false) }
@@ -86,7 +90,6 @@ fun DashboardScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
                     Box(
                         modifier = Modifier
                             .size(52.dp)
@@ -95,16 +98,19 @@ fun DashboardScreen(
                             .clickable {
                                 scope.launch {
                                     isLoading = true
-                                    delay(1200)
+                                    delay(600)
                                     isLoading = false
                                     navController.navigate("profil")
                                 }
-                            }
+                            },
+                        contentAlignment = Alignment.Center
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.profil),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
+                            painter = painterResource(id = user?.profileImage ?: R.drawable.login),
+                            contentDescription = "Profile Picture",
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )
                     }
@@ -112,14 +118,18 @@ fun DashboardScreen(
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Selamat Datang!", color = BlackSolid)
+                        Text("Selamat Datang!", color = BlackSolid, fontSize = 16.sp)
                         Text(
-                            "Tiwi Mustika Dewi",
+                            user?.fullName ?: "User",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = BlackSolid
+                            fontSize = 15.sp,
+                            maxLines = 1,
+                            color = BlackSolid,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
+                    Spacer(modifier = Modifier.width(12.dp))
+
 
                     IconButton(onClick = { showSearchDialog = true }) {
                         Icon(Icons.Outlined.Search, contentDescription = null, tint = BlackSolid)
@@ -371,7 +381,7 @@ fun DashboardScreen(
 }
 
 @Composable
-fun ServiceCard(icon: ImageVector, label: String, onClick: () -> Unit) {
+fun ServiceCard(icon: ImageVector, label: String, onClick: () -> Unit, style: TextStyle = MaterialTheme.typography.bodyMedium) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable { onClick() }
@@ -390,11 +400,11 @@ fun ServiceCard(icon: ImageVector, label: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun HabitCard(task: Task, onDone: () -> Unit) {
+fun HabitCard(task: Task, onDone: () -> Unit, style: TextStyle = MaterialTheme.typography.bodyMedium) {
     Card(
         modifier = Modifier
             .width(260.dp)
-            .height(IntrinsicSize.Min),
+            .height(180.dp),
         colors = CardDefaults.cardColors(containerColor = GreenDeep),
         shape = RoundedCornerShape(24.dp)
     ) {
@@ -432,7 +442,8 @@ fun ProgressCard(
     subtitle: String,
     progressValue: Float,
     progressLabel: String,
-    color: Color
+    color: Color,
+    style: TextStyle = MaterialTheme.typography.bodyMedium
 ) {
     Card(
         modifier = modifier,
@@ -532,7 +543,7 @@ fun SearchDialog(
     onQueryChange: (String) -> Unit,
     filteredFeatures: List<Feature>,
     onDismiss: () -> Unit,
-    onFeatureClick: (String) -> Unit
+    onFeatureClick: (String) -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card(

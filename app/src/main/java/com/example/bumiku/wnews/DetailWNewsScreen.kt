@@ -2,6 +2,7 @@ package com.example.bumiku.wnews
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,7 +12,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,7 +54,6 @@ fun DetailWNewsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-
     ) {
 
         Surface(
@@ -63,24 +62,19 @@ fun DetailWNewsScreen(
         ) {
             Box(
                 modifier = Modifier
-                    .statusBarsPadding()
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp)
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                contentAlignment = Alignment.Center
             ) {
-
-                IconButton(
-                    onClick = {
-                        navController.popBackStack()
-                    },
-                    modifier = Modifier.align(Alignment.CenterStart)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null,
-                        tint = GoldYellow
-                    )
-                }
-
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = GoldYellow,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .align(Alignment.CenterStart)
+                        .clickable { navController.popBackStack() }
+                )
                 Text(
                     text = "WNews",
                     style = MaterialTheme.typography.titleLarge,
@@ -136,7 +130,6 @@ fun DetailWNewsScreen(
                         defaultElevation = 2.dp
                     )
                 ) {
-
                     Text(
                         text = news.content,
                         style = MaterialTheme.typography.bodyLarge,

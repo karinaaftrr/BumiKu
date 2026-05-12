@@ -57,9 +57,9 @@ fun TrackerScreen(
         Surface(color = GreenDeep, modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
-                    .statusBarsPadding()
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                contentAlignment = Alignment.Center
             ) {
 
                 Icon(

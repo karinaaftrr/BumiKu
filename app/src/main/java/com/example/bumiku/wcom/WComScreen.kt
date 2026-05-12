@@ -169,9 +169,9 @@ fun HeaderSection(onBackClick: () -> Unit, onHistoryClick: () -> Unit) {
     Surface(color = GreenDeep, modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
-                .statusBarsPadding()
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
