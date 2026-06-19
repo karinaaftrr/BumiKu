@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "311641366004",
+    "project_id": "bumiku-420de",
+    "storage_bucket": "bumiku-420de.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311641366004:android:d5eb35c8e03813707beda1",
+        "android_client_info": {
+          "package_name": "com.example.bumiku"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "311641366004-f6u6g7hqhi0l5blp2i0ld60ggi87i9v4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bumiku",
+            "certificate_hash": "95b870dbc75ab3d6f4f213618a805c00450770ba"
+          }
+        },
+        {
+          "client_id": "311641366004-q2nv9nglb4l8o7inhiphdcah1r28sc36.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoq4EI9lzM1mZ4PYQCcwhw1gQXAVrrU_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311641366004-fev1m6fee9nh359lai1ihebisau29vkp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
